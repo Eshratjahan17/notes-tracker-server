@@ -29,9 +29,9 @@ async function run() {
     //     "text":"mid term"
     //     }
     app.get("/notes", async (req, res) => {
-      const query = {};
-      console.log(query);
-      const cursor = collection.find(query);
+      const q = req.query;
+      console.log(q);
+      const cursor = collection.find(q);
       const result = await cursor.toArray();
 
       res.send(result);
