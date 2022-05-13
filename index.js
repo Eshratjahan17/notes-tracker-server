@@ -4,7 +4,7 @@ const app=express();
 const port=process.env.PORT || 5000;
 require("dotenv").config();
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion ,ObjectId} = require("mongodb");
 app.use(cors());
 app.use(express.json());
 //connection
@@ -33,8 +33,11 @@ async function run() {
       console.log(query);
       const cursor = collection.find(query);
       const result = await cursor.toArray();
+
       res.send(result);
     });
+
+    //Post note
     //post api(insert data):http://localhost:5000/note
     app.post("/note", async (req, res) => {
       const data = req.body;
@@ -43,10 +46,32 @@ async function run() {
       res.send(result);
     });
 
-    //Post note
-
     //update notes
+    //update api:http://localhost:5000/note/627e26d3fec013dd4a339314
+    app.put("/note/:id", async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          name: data.name,
+          text: data.text,
+        },
+      };
+      const result = await collection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
     //delete notes
+    //delete api:http://localhost:5000/note/627e26d3fec013dd4a339314
+
+    app.delete("/note/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await collection.deleteOne(filter);
+      res.send(result);
+    });
     console.log("database connected");
   }
   catch{
